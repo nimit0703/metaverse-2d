@@ -79,9 +79,6 @@ CREATE TABLE "Avatar" (
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
-
--- CreateIndex
 CREATE UNIQUE INDEX "User_password_key" ON "User"("password");
 
 -- CreateIndex
