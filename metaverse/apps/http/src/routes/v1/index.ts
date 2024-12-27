@@ -3,14 +3,15 @@ import { userRouter } from "./user";
 import { spaceRouter } from "./space";
 import { adminRouter } from "./admin";
 import { SigninSchema, SignupSchema } from "../../types";
-import client from "@repo/db/client";
+// import client from "@repo/db/client";
+const client = require("@repo/db/client");
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../../config";
 export const router = Router();
 router.post("/signup", async (req, res) => {
   const parsedData = SignupSchema.safeParse(req.body);
-
+  
   if (!parsedData.success) {
     res.status(400).json({ error: parsedData.error.message });
     return;
@@ -33,8 +34,9 @@ router.post("/signup", async (req, res) => {
     return;
   }
 });
-router.post("/signin", async (req, res) => {
+router.post("/signin", async (req, res) => {  
   const parsedData = SigninSchema.safeParse(req.body);
+  
   if (!parsedData.success) {
     res.status(403).json({ error: parsedData.error.message });
     return;
@@ -46,6 +48,7 @@ router.post("/signin", async (req, res) => {
         username: parsedData.data.username,
       },
     });
+    
     if (!user) {
       res.status(403).json({ message: "Invalid credentials" });
       return;

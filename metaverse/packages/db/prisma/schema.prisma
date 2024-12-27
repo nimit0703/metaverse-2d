@@ -20,7 +20,7 @@ model User {
   avatarId String?
   role     Role
   spaces   Space[]
-  avtar Avatar? @relation(fields: [avatarId], references: [id])
+  avatar Avatar? @relation(fields: [avatarId], references: [id])
 }
 
 model Space {
