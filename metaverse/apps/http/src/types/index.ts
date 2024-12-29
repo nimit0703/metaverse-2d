@@ -1,5 +1,14 @@
 import z from "zod";
 
+declare global {
+  namespace Express {
+    export interface Request {
+      userId?: string;
+      role?: string;
+    }
+  }
+}
+
 export const SignupSchema = z.object({
   username: z.string(),
   password: z.string().min(8),
@@ -41,16 +50,18 @@ export const UpdateElementSchema = z.object({
 });
 
 export const CreatrAvatarSchema = z.object({
-    imageUrl: z.string(),
-    name: z.string(),
-})
+  imageUrl: z.string(),
+  name: z.string(),
+});
 
 export const CreateMapSchema = z.object({
-    thumbnail: z.string(),
-    dimentions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
-    defaultElements:z.array(z.object({
-        elementId: z.string(),
-        x: z.number(),
-        y: z.number(),
-    }))
-})
+  thumbnail: z.string(),
+  dimentions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
+  defaultElements: z.array(
+    z.object({
+      elementId: z.string(),
+      x: z.number(),
+      y: z.number(),
+    })
+  ),
+});
