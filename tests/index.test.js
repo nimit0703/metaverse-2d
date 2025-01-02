@@ -38,73 +38,36 @@ const axios = {
   },
 }
 
-// describe("Authentication", () => {
-//   test("user be able to sign up only once", async () => {
-//     const username = "nimit" + Math.random();
-//     const password = "12345678";
-//     const response = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-//       username,
-//       password,
-//       type: "admin",
-//     });
-//     expect(response.status).toBe(200);
+describe("Authentication", () => {
+  test("user be able to sign up only once", async () => {
+    const username = "nimit" + Math.random();
+    const password = "12345678";
+    const response = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      username,
+      password,
+      type: "admin",
+    });
+    expect(response.status).toBe(200);
 
-//     const updatedResponse = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-//       username,
-//       password,
-//       type: "admin",
-//     });
+    const updatedResponse = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      username,
+      password,
+      type: "admin",
+    });
 
-//     expect(updatedResponse.status).toBe(400);
-//   });
+    expect(updatedResponse.status).toBe(400);
+  });
 
-//   test("signup request fails is username is empty", async () => {
-//     const password = "1234";
-//     const response = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-//       password,
-//       type: "admin",
-//     });
-//     expect(response.status).toBe(400);
-//   });
+  test("signup request fails is username is empty", async () => {
+    const password = "1234";
+    const response = await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      password,
+      type: "admin",
+    });
+    expect(response.status).toBe(400);
+  });
 
-//   test("signin succeeds if username and password are correct", async () => {
-//     const username = "nimit" + Math.random();
-//     const password = "123456789";
-//     await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-//       username,
-//       password,
-//       type: "admin",
-//     });
-
-//     const response = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
-//       username,
-//       password,
-//     });
-//     expect(response.status).toBe(200);
-//     expect(response.data.token).toBeDefined();
-//   });
-
-//   test("signin fails if username and password are incorrect", async () => {
-//     const username = "nimit" + Math.random();
-//     const password = "1234";
-//     await axios.post(`${BACKEND_URL}/api/v1/signup`, {
-//       username,
-//       password,
-//       type: "admin",
-//     });
-//     const response = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
-//       username: "wrong_username",
-//       password: "wrong_password",
-//     });
-//     expect(response.status).toBe(403);
-//   });
-
-// });
-
-describe("User metadata endpoints", () => {
-  let token = "";
-  let avatarId = "";
-  beforeAll(async () => {
+  test("signin succeeds if username and password are correct", async () => {
     const username = "nimit" + Math.random();
     const password = "123456789";
     await axios.post(`${BACKEND_URL}/api/v1/signup`, {
@@ -112,60 +75,97 @@ describe("User metadata endpoints", () => {
       password,
       type: "admin",
     });
+
     const response = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
       username,
       password,
-    });  
-    console.log("token sent", response.data);
-      
-    token = response.data.token;
-
-    const avatarResponce = await axios.post(
-      `${BACKEND_URL}/api/v1/admin/avatar`,
-      {
-        imageUrl: "img",
-        name: "avatar1",
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    avatarId = avatarResponce.data.avatarId;
+    });
+    expect(response.status).toBe(200);
+    expect(response.data.token).toBeDefined();
   });
 
-  test("User cann't update their matadata with wrong avatar id", async () => {
-    const response = await axios.post(
-      `${BACKEND_URL}/api/v1/user/metadata`,
-      {
-        avatarId: "1245786",
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );    
-    expect(response.status).toBe(400);
+  test("signin fails if username and password are incorrect", async () => {
+    const username = "nimit" + Math.random();
+    const password = "1234";
+    await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+      username,
+      password,
+      type: "admin",
+    });
+    const response = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+      username: "wrong_username",
+      password: "wrong_password",
+    });
+    expect(response.status).toBe(403);
   });
 
-  // test("User can update their matadat with right avatar id", async () => {
-  //   const response = await axios.put(
-  //     `${BACKEND_URL}/api/v1/user/metadata`,
-  //     {
-  //       avatarId,
-  //     },
-  //     {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     }
-  //   );
-  //   expect(response.status).toBe(200);
-  // });
-
-  // test("USer is not able to update their matadata if the auth header is not present", async () => {
-  //   const response = await axios.put(`${BACKEND_URL}/api/v1/user/metadata`, {
-  //     avatarId,
-  //   });
-  //   expect(response.status).toBe(403);
-  // });
 });
+
+// describe("User metadata endpoints", () => {
+//   let token = "";
+//   let avatarId = "";
+//   beforeAll(async () => {
+//     const username = "nimit" + Math.random();
+//     const password = "123456789";
+//     await axios.post(`${BACKEND_URL}/api/v1/signup`, {
+//       username,
+//       password,
+//       type: "admin",
+//     });
+//     const response = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
+//       username,
+//       password,
+//     });  
+//     console.log("token sent", response.data);
+      
+//     token = response.data.token;
+
+//     const avatarResponce = await axios.post(
+//       `${BACKEND_URL}/api/v1/admin/avatar`,
+//       {
+//         imageUrl: "img",
+//         name: "avatar1",
+//       },
+//       {
+//         headers: { Authorization: `Bearer ${token}` },
+//       }
+//     );
+//     avatarId = avatarResponce.data.avatarId;
+//   });
+
+//   test("User cann't update their matadata with wrong avatar id", async () => {
+//     const response = await axios.post(
+//       `${BACKEND_URL}/api/v1/user/metadata`,
+//       {
+//         avatarId: "1245786",
+//       },
+//       {
+//         headers: { Authorization: `Bearer ${token}` },
+//       }
+//     );    
+//     expect(response.status).toBe(400);
+//   });
+
+//   // test("User can update their matadat with right avatar id", async () => {
+//   //   const response = await axios.put(
+//   //     `${BACKEND_URL}/api/v1/user/metadata`,
+//   //     {
+//   //       avatarId,
+//   //     },
+//   //     {
+//   //       headers: { Authorization: `Bearer ${token}` },
+//   //     }
+//   //   );
+//   //   expect(response.status).toBe(200);
+//   // });
+
+//   // test("USer is not able to update their matadata if the auth header is not present", async () => {
+//   //   const response = await axios.put(`${BACKEND_URL}/api/v1/user/metadata`, {
+//   //     avatarId,
+//   //   });
+//   //   expect(response.status).toBe(403);
+//   // });
+// });
 
 // describe("User avatar information", () => {
 //   let token = "";

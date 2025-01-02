@@ -5,19 +5,18 @@ import { adminRouter } from "./admin";
 import { SigninSchema, SignupSchema } from "../../types";
 import client from "@repo/db/client";
 // const client = require("@repo/db/client");
-import bcrypt from "bcrypt";
+import { hash, compare } from "../../scrypt";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../../config";
 export const router = Router();
 router.post("/signup", async (req, res) => {
   const parsedData = SignupSchema.safeParse(req.body);
-  
+
   if (!parsedData.success) {
     res.status(400).json({ error: parsedData.error.message });
     return;
-  }
-
-  const hashedPassword = await bcrypt.hash(parsedData.data.password, 10);
+  }  
+  const hashedPassword = await hash(parsedData.data.password);
   try {
     const user = await client.user.create({
       data: {
@@ -25,18 +24,19 @@ router.post("/signup", async (req, res) => {
         password: hashedPassword,
         role: parsedData.data.type === "admin" ? "Admin" : "User",
       },
-    });
+    });    
     res.json({
       userId: user.id,
     });
   } catch (error) {
+  
     res.status(400).json({ message: "User already exsists" });
     return;
   }
 });
-router.post("/signin", async (req, res) => {  
+router.post("/signin", async (req, res) => {
   const parsedData = SigninSchema.safeParse(req.body);
-  
+
   if (!parsedData.success) {
     res.status(403).json({ error: parsedData.error.message });
     return;
@@ -48,15 +48,12 @@ router.post("/signin", async (req, res) => {
         username: parsedData.data.username,
       },
     });
-    
+
     if (!user) {
       res.status(403).json({ message: "Invalid credentials" });
       return;
     }
-    const isMatch = await bcrypt.compare(
-      parsedData.data.password,
-      user.password
-    );
+    const isMatch = await compare(parsedData.data.password, user.password);
     if (!isMatch) {
       res.status(403).json({ message: "Invalid credentials" });
       return;
