@@ -8,7 +8,6 @@ import client from "@repo/db/client";
 import { hash, compare } from "../../scrypt";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../../config";
-import { log } from "node:console";
 export const router = Router();
 router.post("/signup", async (req, res) => {
   const parsedData = SignupSchema.safeParse(req.body);
