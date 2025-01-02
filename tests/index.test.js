@@ -283,7 +283,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/admin/map`,
 //       {
 //         thumbnail: "img",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         defaultElements: [
 //           {
 //             elementId: element1Id,
@@ -318,7 +318,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         mapId,
 //       },
 //       {
@@ -332,7 +332,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //       },
 //       {
 //         headers: { Authorization: `Bearer ${userToken}` },
@@ -340,7 +340,7 @@ describe("Authentication", () => {
 //     );
 //     expect(response.data.spaceId).toBeDefined();
 //   });
-//   test("User is able to create a space without a mapId(empty space) and dimentions", async () => {
+//   test("User is able to create a space without a mapId(empty space) and dimensions", async () => {
 //     const response = await axios.post(
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
@@ -366,7 +366,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //       },
 //       {
 //         headers: { Authorization: `Bearer ${userToken}` },
@@ -386,7 +386,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //       },
 //       {
 //         headers: { Authorization: `Bearer ${userToken}` },
@@ -411,7 +411,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //       },
 //       {
 //         headers: { Authorization: `Bearer ${adminToken}` },
@@ -497,7 +497,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/admin/map`,
 //       {
 //         thumbnail: "img",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         defaultElements: [
 //           {
 //             elementId: element1Id,
@@ -531,7 +531,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space avatar",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         mapId,
 //       },
 //       {
@@ -553,7 +553,7 @@ describe("Authentication", () => {
 //       headers: { Authorization: `Bearer ${userToken}` },
 //     });
 
-//     expect(space.data.dimentions).toBe("100x200");
+//     expect(space.data.dimensions).toBe("100x200");
 //   });
 //   test("delete  endpoint is able to delete element", async () => {
 //     const space = await axios.get(`${BACKEND_URL}/api/v1/space/${spaceID}`, {
@@ -674,7 +674,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/admin/map`,
 //       {
 //         thumbnail: "img",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         defaultElements: [],
 //       },
 //       {
@@ -725,7 +725,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/admin/map`,
 //       {
 //         thumbnail: "img",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         defaultElements: [],
 //       },
 //       {
@@ -864,7 +864,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/admin/map`,
 //       {
 //         thumbnail: "img",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         defaultElements: [
 //           {
 //             elementId: element1Id,
@@ -898,7 +898,7 @@ describe("Authentication", () => {
 //       `${BACKEND_URL}/api/v1/space`,
 //       {
 //         name: "test space avatar",
-//         dimentions: "100x200",
+//         dimensions: "100x200",
 //         mapId,
 //       },
 //       {

@@ -27,7 +27,7 @@ export const UpdateMetadataSchema = z.object({
 export const createSpaceSchema = z.object({
   name: z.string(),
   // custom function that validates 100x100 schema
-  dimentions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
+  dimensions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
   mapId: z.string(),
 });
 
@@ -56,7 +56,7 @@ export const CreatrAvatarSchema = z.object({
 
 export const CreateMapSchema = z.object({
   thumbnail: z.string(),
-  dimentions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
+  dimensions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
   defaultElements: z.array(
     z.object({
       elementId: z.string(),
@@ -65,3 +65,7 @@ export const CreateMapSchema = z.object({
     })
   ),
 });
+
+export const DeleteElementSchema = z.object({
+  id: z.string(),
+})

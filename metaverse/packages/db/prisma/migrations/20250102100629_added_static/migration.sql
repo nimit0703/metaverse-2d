@@ -6,7 +6,7 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "avatarId" TEXT NOT NULL,
+    "avatarId" TEXT,
     "role" "Role" NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -41,6 +41,7 @@ CREATE TABLE "Element" (
     "width" INTEGER NOT NULL,
     "height" INTEGER NOT NULL,
     "imageUrl" TEXT NOT NULL,
+    "static" BOOLEAN NOT NULL,
 
     CONSTRAINT "Element_pkey" PRIMARY KEY ("id")
 );
@@ -79,7 +80,7 @@ CREATE TABLE "Avatar" (
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_password_key" ON "User"("password");
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Space_id_key" ON "Space"("id");
@@ -100,7 +101,7 @@ CREATE UNIQUE INDEX "mapElements_id_key" ON "mapElements"("id");
 CREATE UNIQUE INDEX "Avatar_id_key" ON "Avatar"("id");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "Avatar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "Avatar"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Space" ADD CONSTRAINT "Space_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
