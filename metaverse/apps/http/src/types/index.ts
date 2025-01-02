@@ -49,13 +49,14 @@ export const UpdateElementSchema = z.object({
   imageUrl: z.string(),
 });
 
-export const CreatrAvatarSchema = z.object({
+export const CreateAvatarSchema = z.object({
   imageUrl: z.string(),
   name: z.string(),
 });
 
 export const CreateMapSchema = z.object({
   thumbnail: z.string(),
+  name: z.string(),
   dimensions: z.string().regex(/^[0-9]{1,4}x[0-9]{1,4}$/),
   defaultElements: z.array(
     z.object({
