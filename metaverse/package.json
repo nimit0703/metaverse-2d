@@ -1,5 +1,5 @@
 {
-  "name": "metaverse2",
+  "name": "metaverse",
   "private": true,
   "scripts": {
     "build": "turbo build",
