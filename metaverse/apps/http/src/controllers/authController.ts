@@ -23,7 +23,6 @@ export const signup = async (req: Request, res: Response) => {
         role: parsedData.data.type === "admin" ? "Admin" : "User",
       },
     });
-    console.log("user created ", user);
     res.json({
       userId: user.id,
     });
@@ -46,7 +45,8 @@ export const signin = async (req: Request, res: Response) => {
         username: parsedData.data.username,
       },
     });
-
+    
+  
     if (!user) {
       res.status(403).json({ message: "Invalid credentials" });
       return;
@@ -62,7 +62,7 @@ export const signin = async (req: Request, res: Response) => {
         role: user.role,
       },
       JWT_PASSWORD
-    );
+    );    
     res.json({ token: token });
   } catch (error) {
     res.status(400).json({ message: "Internal server error" });

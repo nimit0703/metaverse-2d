@@ -8,11 +8,13 @@ import {
 
 export const createSpace = async (req: Request, res: Response) => {
   const parsedData = createSpaceSchema.safeParse(req.body);
+  
   if (!parsedData.success) {
     res.status(400).json({ error: parsedData.error.message });
     return;
   }
   if (!parsedData.data.mapId) {
+    
     const newSpace = await client.space.create({
       data: {
         name: parsedData.data.name,
@@ -21,10 +23,11 @@ export const createSpace = async (req: Request, res: Response) => {
         creatorId: req.userId!,
       },
     });
+    
     res.json({ spaceId: newSpace.id });
     return;
   }
-
+  
   const map = await client.map.findFirst({
     where: { id: parsedData.data.mapId },
     select: {
@@ -32,11 +35,13 @@ export const createSpace = async (req: Request, res: Response) => {
       width: true,
       height: true,
     },
-  });
+  });  
+  
   if (!map) {
     res.status(404).json({ message: "Map not found" });
     return;
   }
+  
   const space = await client.$transaction(async () => {
     const newSpace = await client.space.create({
       data: {
@@ -71,12 +76,12 @@ export const findSpace = async (req: Request, res: Response) => {
     },
   });
   if (!space) {
-    res.status(404).json({ message: "Space not found" });
+    res.status(400).json({ message: "Space not found" });
     return;
   }
 
   res.json({
-    dimensions: `$${space.width}x${space.height}`,
+    dimensions: `${space.width}x${space.height}`,
     elements: space.elements.map((e) => ({
       id: e.id,
       element: {
@@ -92,17 +97,18 @@ export const findSpace = async (req: Request, res: Response) => {
   });
 };
 export const deleteSpace = async (req: Request, res: Response) => {
+  
   const space = await client.space.findUnique({
     where: { id: req.params.spaceId },
     select: { creatorId: true },
   });
+  
   if (!space) {
-    res.status(404).json({ message: "Space not found" });
+    res.status(400).json({ message: "Space not found" });
     return;
   }
 
   if (space.creatorId !== req.userId) {
-    console.log("code should reach here");
     res.status(403).json({ message: "Unauthorized" });
     return;
   }
@@ -111,9 +117,11 @@ export const deleteSpace = async (req: Request, res: Response) => {
   res.json({ message: "Space deleted successfully" });
 };
 export const getAllSpaces = async (req: Request, res: Response) => {
+  
   const spaces = await client.space.findMany({
     where: { creatorId: req.userId },
   });
+  
   res.json({
     spaces: spaces.map((s) => ({
       id: s.id,
@@ -163,6 +171,7 @@ export const addElementToSpace = async (req: Request, res: Response) => {
 };
 
 export const deleteElementFromSpace = async (req: Request, res: Response) => {
+  
   const parsedData = DeleteElementSchema.safeParse(req.body);
   if (!parsedData.success) {
     res.status(400).json({ error: parsedData.error.message });
@@ -179,6 +188,7 @@ export const deleteElementFromSpace = async (req: Request, res: Response) => {
     !spaceElement?.space.creatorId ||
     spaceElement.space.creatorId !== req.userId
   ) {
+    
     res.status(403).json({ message: "Unauthorized" });
     return;
   }

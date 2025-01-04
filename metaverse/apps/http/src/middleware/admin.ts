@@ -8,7 +8,7 @@ export const adminMiddleware = (
   next: NextFunction
 ) => {
   const header = req.headers["authorization"];
-  const token = header?.split(" ")[1];
+  const token = header?.split(" ")[1];  
   if (!token) {
     res.status(403).json({ error: "Unauthorized" });
     return;

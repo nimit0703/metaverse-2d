@@ -7,11 +7,11 @@ export const userMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("middleware req", req.body);
-  console.log("middleware req", req.headers);
   
   const header = req.headers["authorization"];
+  
   const token = header?.split(" ")[1];
+  
   if (!token) {
     res.status(403).json({ error: "Unauthorized" });
     return;
@@ -23,6 +23,7 @@ export const userMiddleware = (
       userId: string;
     };
     req.userId = decoded.userId;
+    
     next();
   } catch (error) {
     res.status(403).json({ error: "Unauthorized" });

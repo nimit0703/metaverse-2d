@@ -10,10 +10,11 @@ import {
 import { userMiddleware } from "../../middleware/user";
 
 export const spaceRouter = Router();
+spaceRouter.use(userMiddleware);
 
 spaceRouter.post("/", createSpace);
+spaceRouter.get("/all", getAllSpaces);
+spaceRouter.delete("/element", deleteElementFromSpace);
+spaceRouter.post("/element", addElementToSpace);
 spaceRouter.get("/:spaceId", findSpace);
-spaceRouter.delete("/:spaceId", userMiddleware, deleteSpace);
-spaceRouter.get("/all", userMiddleware, getAllSpaces);
-spaceRouter.post("/element", userMiddleware, addElementToSpace);
-spaceRouter.delete("/element", userMiddleware, deleteElementFromSpace);
+spaceRouter.delete("/:spaceId", deleteSpace);
