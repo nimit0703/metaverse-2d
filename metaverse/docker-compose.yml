@@ -1,0 +1,96 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prisma:
+    image: node:18
+    container_name: prisma_service
+    working_dir: /app/packages/db
+    volumes:
+      - .:/app
+    command: >
+      sh -c "
+      npm install &&
+      npx prisma generate &&
+      npx prisma migrate deploy
+      "
+    environment:
+      DATABASE_URL: "postgresql://postgres:mysecretpassword@postgres:5432/postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  http:
+    image: node:18
+    container_name: http_service
+    working_dir: /app/apps/http
+    volumes:
+      - .:/app
+    command: >
+      sh -c "
+      npm install &&
+      npm run dev
+      "
+    environment:
+      DATABASE_URL: "postgresql://postgres:mysecretpassword@postgres:5432/postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prisma:
+        condition: service_started
+    ports:
+      - "3000:3000"
+
+  ws:
+    image: node:18
+    container_name: ws_service
+    working_dir: /app/apps/ws
+    volumes:
+      - .:/app
+    command: >
+      sh -c "
+      npm install &&
+      npm run dev
+      "
+    environment:
+      DATABASE_URL: "postgresql://postgres:mysecretpassword@postgres:5432/postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prisma:
+        condition: service_started
+    ports:
+      - "3001:3001"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_service
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

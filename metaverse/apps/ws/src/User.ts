@@ -91,7 +91,7 @@ export class User {
           RoomManager.getInstance().broadcastMessage(this, spaceId, {
             type: "user-joined",
             payload: {
-              userId: this.id,
+              userId: this.userId,
               x: this.x,
               y: this.y,
             },

@@ -38,7 +38,7 @@ const axios = {
   },
 };
 
-describe.skip("Authentication", () => {
+describe("Authentication", () => {
   test("user be able to sign up only once", async () => {
     const username = "nimit" + Math.random();
     const password = "012345678678";
@@ -100,7 +100,7 @@ describe.skip("Authentication", () => {
   });
 });
 
-describe.skip("User metadata endpoints", () => {
+describe("User metadata endpoints", () => {
   let token = "";
   let avatarId = "";
   beforeAll(async () => {
@@ -165,7 +165,7 @@ describe.skip("User metadata endpoints", () => {
   });
 });
 
-describe.skip("User avatar information", () => {
+describe("User avatar information", () => {
   let token = "";
   let avatarId = "";
   let userId;
@@ -215,7 +215,7 @@ describe.skip("User avatar information", () => {
   });
 });
 
-describe.skip("space information", () => {
+describe("space information", () => {
   let mapId;
   let element1Id, element2Id;
   let adminToken;
@@ -429,7 +429,7 @@ describe.skip("space information", () => {
   });
 });
 
-describe.skip("arena Information", () => {
+describe("arena Information", () => {
   let mapId;
   let element1Id, element2Id;
   let adminToken;
@@ -620,7 +620,7 @@ describe.skip("arena Information", () => {
   });
 });
 
-describe.skip("admin endpoints", () => {
+describe("admin endpoints", () => {
   let mapId;
   let element1Id, element2Id;
   let adminToken;
@@ -1013,7 +1013,7 @@ describe("Websocket tests", () => {
     userY = message2.payload.spawn.y;
   });
 
-  test.skip("User should not be able to move across the boundary of the wall", async () => {
+  test("User should not be able to move across the boundary of the wall", async () => {
     ws1.send(
       JSON.stringify({
         type: "move",
@@ -1030,7 +1030,7 @@ describe("Websocket tests", () => {
     expect(message.payload.y).toBe(adminY);
   });
 
-  test.skip("User should not be able to move two blocks at the same time", async () => {
+  test("User should not be able to move two blocks at the same time", async () => {
     ws1.send(
       JSON.stringify({
         type: "move",
@@ -1047,7 +1047,7 @@ describe("Websocket tests", () => {
     expect(message.payload.y).toBe(adminY);
   });
 
-  test.skip("Correct movement should be broadcasted to the other sockets in the room", async () => {
+  test("Correct movement should be broadcasted to the other sockets in the room", async () => {
     ws1.send(
       JSON.stringify({
         type: "move",
@@ -1065,7 +1065,7 @@ describe("Websocket tests", () => {
     expect(message.payload.y).toBe(adminY);
   });
 
-  test.skip("If a user leaves, the other user receives a leave event", async () => {
+  test("If a user leaves, the other user receives a leave event", async () => {
     ws1.close();
     const message = await waitForAndPopLatestMessage(ws2Messages);
     expect(message.type).toBe("user-left");
