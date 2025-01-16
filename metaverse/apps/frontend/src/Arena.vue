@@ -1,235 +1,162 @@
 <template>
-    <div class="p-4" tabindex="0" @keydown="handleKeyDown">
-      <h1 class="text-2xl font-bold mb-4">Arena</h1>
-      <div class="mb-4">
-        <p class="text-sm text-gray-600">Token: {{ params.token }}</p>
-        <p class="text-sm text-gray-600">Space ID: {{ params.spaceId }}</p>
-        <p class="text-sm text-gray-600">Connected Users: {{ connectedUsersCount }}</p>
+  <div class="container mt-4 p-4 border rounded shadow-lg bg-light" tabindex="0" @keydown="handleKeyDown">
+    <h1 class="text-center text-primary mb-4">Welcome to the Arena</h1>
+    <div class="arena-container d-flex justify-content-center border rounded bg-white p-2 position-relative">
+      <canvas ref="canvasRef" :width="canvasWidth" :height="canvasHeight" class="border bg-light shadow"></canvas>
+      <div class="arena-info text-center mt-3">
+        <p class="text-muted">Use arrow keys to move your avatar.</p>
+        <p class="text-primary">Connected Players: {{ connectedUsersCount }}</p>
       </div>
-      <div class="border rounded-lg overflow-hidden">
-        <canvas
-          ref="canvasRef"
-          width="2000"
-          height="2000"
-          class="bg-white"
-        />
-      </div>
-      <p class="mt-2 text-sm text-gray-500">Use arrow keys to move your avatar</p>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'Arena',
-    data() {
-      return {
-        wsRef: null,
-        currentUser: {},
-        users: new Map(),
-        params: {
-          token: '',
-          spaceId: ''
-        }
+  </div>
+</template>
+
+<script>
+export default {
+  name: "Arena",
+  data() {
+    return {
+      canvasContext: null,
+      currentUser: { x: 0, y: 0, size: 100 }, // Avatar position and size
+      users: new Map(),
+      obstacles: [
+        { x: 200, y: 150, width: 100, height: 100 },
+        { x: 500, y: 300, width: 100, height: 100 },
+        { x: 700, y: 100, width: 100, height: 100 },
+      ], // Obstacles with positions and sizes
+      backgroundImage: null, // Image object for the background
+      canvasHeight: 700,
+      canvasWidth: 1000,
+      avatarImage: null, // Image object for the avatar
+    };
+  },
+  computed: {
+    connectedUsersCount() {
+      return this.users.size + 1; // Including current user
+    },
+  },
+  mounted() {
+    this.initializeCanvas();
+    this.loadBackgroundImage();
+  },
+  methods: {
+    initializeCanvas() {
+      const canvas = this.$refs.canvasRef;
+      this.canvasContext = canvas.getContext("2d");
+    },
+    loadBackgroundImage() {
+      this.backgroundImage = new Image();
+      this.backgroundImage.src = "./src/assets/office.jpg"; // Path to your image
+
+      this.avatarImage = new Image();
+      this.avatarImage.src = "./src/assets/avtar3.png"; // Path to your avatar image
+
+      this.backgroundImage.onload = () => this.drawArena();
+      this.avatarImage.onload = () => this.drawArena();
+    },
+    drawArena() {
+      const canvas = this.$refs.canvasRef;
+      const ctx = this.canvasContext;
+
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the background image
+      if (this.backgroundImage) {
+        ctx.drawImage(this.backgroundImage, 0, 0, canvas.width, canvas.height);
+      }
+
+      // Draw obstacles
+      this.obstacles.forEach((obstacle) => {
+        ctx.fillStyle = "gray";
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      });
+
+      // Draw the current user's avatar
+      if (this.avatarImage) {
+        this.drawAvatar(ctx, this.currentUser.x, this.currentUser.y);
+      }
+
+      // Draw other users' avatars
+      this.users.forEach((user) => {
+        this.drawAvatar(ctx, user.x, user.y, "red");
+      });
+    },
+    drawAvatar(ctx, x, y, color) {
+      const size = this.currentUser.size;
+      if (this.avatarImage) {
+        ctx.drawImage(
+          this.avatarImage,
+          x - size / 2,
+          y - size / 2,
+          size,
+          size
+        );
+      } else {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, this.currentUser.size / 2, 0, Math.PI * 2); // Circle avatar
+        ctx.fill();
       }
     },
-    computed: {
-      connectedUsersCount() {
-        return this.users.size + (this.currentUser?.userId ? 1 : 0)
+    handleKeyDown(e) {
+      const moveStep = 10; // Pixels to move per key press
+      let newX = this.currentUser.x;
+      let newY = this.currentUser.y;
+
+      switch (e.key) {
+        case "ArrowUp":
+          newY = Math.max(newY - moveStep, this.currentUser.size / 2);
+          break;
+        case "ArrowDown":
+          newY = Math.min(
+            newY + moveStep,
+            this.canvasHeight - this.currentUser.size / 2
+          );
+          break;
+        case "ArrowLeft":
+          newX = Math.max(newX - moveStep, this.currentUser.size / 2);
+          break;
+        case "ArrowRight":
+          newX = Math.min(
+            newX + moveStep,
+            this.canvasWidth - this.currentUser.size / 2
+          );
+          break;
+      }
+
+      // Check if the new position collides with any obstacle
+      if (!this.checkCollision(newX, newY)) {
+        this.currentUser.x = newX;
+        this.currentUser.y = newY;
+        this.drawArena();
       }
     },
-    mounted() {
-      this.initializeArena()
-      this.setupWebSocket()
+    checkCollision(newX, newY) {
+      const halfSize = this.currentUser.size / 2;
+
+      return this.obstacles.some((obstacle) => {
+        return (
+          newX + halfSize > obstacle.x &&
+          newX - halfSize < obstacle.x + obstacle.width &&
+          newY + halfSize > obstacle.y &&
+          newY - halfSize < obstacle.y + obstacle.height
+        );
+      });
     },
-    unmounted() {
-      if (this.wsRef) {
-        this.wsRef.close()
-      }
-    },
-    watch: {
-      currentUser: {
-        deep: true,
-        handler() {
-          this.drawArena()
-        }
-      },
-      users: {
-        deep: true,
-        handler() {
-          this.drawArena()
-        }
-      }
-    },
-    methods: {
-      initializeArena() {
-        const urlParams = new URLSearchParams(window.location.search)
-        this.params.token = urlParams.get('token') || ''
-        this.params.spaceId = urlParams.get('spaceId') || ''
-      },
-      
-      setupWebSocket() {
-        this.wsRef = new WebSocket('ws://localhost:3001')
-        
-        this.wsRef.onopen = () => {
-          this.wsRef.send(JSON.stringify({
-            type: 'join',
-            payload: {
-              spaceId: this.params.spaceId,
-              token: this.params.token
-            }
-          }))
-        }
-  
-        this.wsRef.onmessage = (event) => {
-          const message = JSON.parse(event.data)
-          this.handleWebSocketMessage(message)
-        }
-      },
-  
-      handleWebSocketMessage(message) {
-        switch (message.type) {
-          case 'space-joined':
-            console.log("set")
-            console.log({
-              x: message.payload.spawn.x,
-              y: message.payload.spawn.y,
-              userId: message.payload.userId
-            })
-            this.currentUser = {
-              x: message.payload.spawn.x,
-              y: message.payload.spawn.y,
-              userId: message.payload.userId
-            }
-            
-            const userMap = new Map()
-            message.payload.users.forEach(user => {
-              userMap.set(user.userId, user)
-            })
-            this.users = userMap
-            break
-  
-          case 'user-joined':
-            this.users.set(message.payload.userId, {
-              x: message.payload.x,
-              y: message.payload.y,
-              userId: message.payload.userId
-            })
-            this.users = new Map(this.users)
-            break
-  
-          case 'movement':
-            const user = this.users.get(message.payload.userId)
-            if (user) {
-              user.x = message.payload.x
-              user.y = message.payload.y
-              this.users.set(message.payload.userId, user)
-              this.users = new Map(this.users)
-            }
-            break
-  
-          case 'movement-rejected':
-            this.currentUser = {
-              ...this.currentUser,
-              x: message.payload.x,
-              y: message.payload.y
-            }
-            break
-  
-          case 'user-left':
-            this.users.delete(message.payload.userId)
-            this.users = new Map(this.users)
-            break
-        }
-      },
-  
-      handleMove(newX, newY) {
-        if (!this.currentUser) return
-        
-        this.wsRef.send(JSON.stringify({
-          type: 'move',
-          payload: {
-            x: newX,
-            y: newY,
-            userId: this.currentUser.userId
-          }
-        }))
-      },
-  
-      drawArena() {
-        console.log("render")
-        const canvas = this.$refs.canvasRef
-        if (!canvas) return
-        console.log("below render")
-        
-        const ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-  
-        // Draw grid
-        ctx.strokeStyle = '#eee'
-        for (let i = 0; i < canvas.width; i += 50) {
-          ctx.beginPath()
-          ctx.moveTo(i, 0)
-          ctx.lineTo(i, canvas.height)
-          ctx.stroke()
-        }
-        for (let i = 0; i < canvas.height; i += 50) {
-          ctx.beginPath()
-          ctx.moveTo(0, i)
-          ctx.lineTo(canvas.width, i)
-          ctx.stroke()
-        }
-  
-        console.log("before currentuser")
-        console.log(this.currentUser)
-        // Draw current user
-        if (this.currentUser && this.currentUser.x !== undefined) {
-          console.log("drawing myself")
-          console.log(this.currentUser)
-          ctx.beginPath()
-          ctx.fillStyle = '#FF6B6B'
-          ctx.arc(this.currentUser.x * 50, this.currentUser.y * 50, 20, 0, Math.PI * 2)
-          ctx.fill()
-          ctx.fillStyle = '#000'
-          ctx.font = '14px Arial'
-          ctx.textAlign = 'center'
-          ctx.fillText('You', this.currentUser.x * 50, this.currentUser.y * 50 + 40)
-        }
-  
-        // Draw other users
-        this.users.forEach(user => {
-          if (user.x === undefined) return
-          console.log("drawing other user")
-          console.log(user)
-          ctx.beginPath()
-          ctx.fillStyle = '#4ECDC4'
-          ctx.arc(user.x * 50, user.y * 50, 20, 0, Math.PI * 2)
-          ctx.fill()
-          ctx.fillStyle = '#000'
-          ctx.font = '14px Arial'
-          ctx.textAlign = 'center'
-          ctx.fillText(`User ${user.id}`, user.x * 50, user.y * 50 + 40)
-        })
-      },
-  
-      handleKeyDown(e) {
-        if (!this.currentUser) return
-  
-        const { x, y } = this.currentUser
-        switch (e.key) {
-          case 'ArrowUp':
-            this.handleMove(x, y - 1)
-            break
-          case 'ArrowDown':
-            this.handleMove(x, y + 1)
-            break
-          case 'ArrowLeft':
-            this.handleMove(x - 1, y)
-            break
-          case 'ArrowRight':
-            this.handleMove(x + 1, y)
-            break
-        }
-      }
-    }
-  }
-  </script>
+  },
+};
+</script>
+
+<style scoped>
+.arena-container {
+  position: relative;
+  margin: 0 auto;
+  max-width: 1000px;
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+}
+</style>
